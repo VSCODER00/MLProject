@@ -35,6 +35,9 @@ class ModelTrainer:
             "XGBoost": (XGBRegressor(), {"n_estimators": [50, 100], "max_depth": [3, 5]})
         }
         overview={}
+        best_model_name = None
+        best_score = float("-inf")
+        best_model_obj = None
         for name, (model, param_grid) in models.items():
             if param_grid:
                 grid_search = GridSearchCV(model, param_grid, cv=3, n_jobs=-1, scoring='r2')
@@ -50,8 +53,12 @@ class ModelTrainer:
             score = r2_score(y_test, y_pred)
 
             overview[name] = score
+            if score > best_score:
+                best_score = score
+                best_model_name = name
+                best_model_obj = best_model
                 
-            
+        saveObj("artifacts/best_model.pkl", best_model_obj)
         
         return overview
 
